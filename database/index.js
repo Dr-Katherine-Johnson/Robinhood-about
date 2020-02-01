@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const config = require("../env.config.js");
 
 mongoose.connect(
-  //`${config.DATABASE_URL}:${config.DATABASE_PORT}/${config.DATABASE_NAME}`,
-  "mongodb://database/robinhood",
+  `${config.DATABASE_URL}:${config.DATABASE_PORT}/${config.DATABASE_NAME}`,
+  // "mongodb://database/robinhood",
   {
     useUnifiedTopology: true,
     useNewUrlParser: true
@@ -37,7 +37,19 @@ const aboutSchema = mongoose.Schema({
 
 const About = mongoose.model("About", aboutSchema);
 
-// retrieves data about stock based on ticker
+// Creates data about stock based on ticker
+const postAbout = (queryString, callback) => {
+  const newAbout = new About(queryString)
+  newAbout.save()
+    .then(result => {
+      callback(null, result);
+    })
+    .catch(err => {
+      console.log("err:", err);
+    });
+};
+
+// Reads data about stock based on ticker
 const getAbout = (queryString, callback) => {
   About.findOne({ ticker: queryString })
     .lean()
@@ -49,4 +61,28 @@ const getAbout = (queryString, callback) => {
     });
 };
 
+// Updates about data for stock ticker
+const putAbout = (queryString, callback) => {
+  About.findOneAndUpdate({ ticker: queryString.params.ticker }, queryString.body, {new: true}, (err, result) => {
+    if (err) {
+      console.log("err:", err);
+    }
+    callback(null, result)
+  })
+};
+
+// Deletes about data for stock ticker 
+const deleteAbout = (queryString, callback) => {
+  About.findOneAndDelete({ ticker: queryString })
+    .lean()
+    .then(result => {
+      callback(null, result);
+    })
+    .catch(err => {
+      console.log("err:", err);
+    });
+};
+
 module.exports = { About, getAbout, mongoose };
+
+module.exports = { About, postAbout, getAbout, putAbout, deleteAbout, mongoose };
