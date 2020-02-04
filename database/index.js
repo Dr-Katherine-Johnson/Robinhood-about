@@ -104,6 +104,4 @@ const deleteAbout = (queryString, callback) => {
     });
 };
 
-module.exports = { About, getAbout, mongoose };
-
 module.exports = { About, postAbout, getAbout, putAbout, deleteAbout, mongoose };

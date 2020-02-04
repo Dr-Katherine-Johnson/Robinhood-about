@@ -7,13 +7,17 @@ const testObject = {
   ticker: "AAAAA",
   about: "ABOUT",
   CEO: "CEO",
-  open: "OPEN"
+  open: "OPEN",
+  employees: 1,
+  headquarters: 'HQ'
 }
 const testObjectNew = {
   ticker: "AAAAA",
   about: "ABOUTNEW",
   CEO: "CEONEW",
-  open: "OPENNEW"
+  open: "OPENNEW",
+  employees: 100,
+  headquarters: 'HQNEW'
 }
 
 //Create
@@ -37,7 +41,7 @@ describe('POST /about endpoint tests', () => {
 describe('GET /about/:ticker endpoint tests', () => {
   it('should return status code 200', done => {
     request(app)
-      .get('/about/ABCD')
+      .get('/about/AAAAA')
       .end((err, res) => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.an('object');
@@ -46,7 +50,7 @@ describe('GET /about/:ticker endpoint tests', () => {
   });
   it('should return a JSON object', done => {
     request(app)
-      .get('/about/ABCD')
+      .get('/about/AAAAA')
       .end((err, res) => {
         expect(res.body).to.be.an('object');
         done();
@@ -54,7 +58,7 @@ describe('GET /about/:ticker endpoint tests', () => {
   });
   it('should return information about the stock', done => {
     request(app)
-      .get('/about/ABCD')
+      .get('/about/AAAAA')
       .end((err, res) => {
         expect(res.body.about).to.be.an('string');
         expect(res.body.employees).to.be.an('number');
