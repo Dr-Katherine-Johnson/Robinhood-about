@@ -33,9 +33,10 @@ const createPrices = () => {
 };
 
 // cycle through ticker array and create data for each item
-const createCollection = () => {
+const createCollection = async () => {
   let collArr = [];
-  for (let i = 0; i < tickers.length; i++) {
+
+  for (let i = 0; i < 100000; i++) { //tickers.length
     let prices = createPrices();
     const stock = new About({
       ticker: tickers[i],
@@ -60,13 +61,25 @@ const createCollection = () => {
       volume: nFormatter(faker.random.number({ min: 10000000, max: 30000000 }))
     });
     collArr.push(stock);
+
+    // every 1000 items, insert into the database
+    const isLastItem = i === tickers.length - 1;
+    if (i % 200 === 0 || isLastItem) {
+      await About.insertMany(collArr, (err, result) => {
+        if (err) {
+          console.log('ERROR ', i, ': ', err);
+        } else if (result) {
+          return new Promise((resolve, reject) => { resolve(collArr = 0)})
+        }
+      })
+    }
   }
-  return collArr;
+  return await('collection seeded');
 };
 
 const save = async () => {
+  console.log('LENGTH: ', tickers.length)
   //clear db before run
-
   await About.deleteMany({}, err => {
     if (err) {
       console.log("err clearing db before seeding: ", err);
@@ -74,16 +87,12 @@ const save = async () => {
       console.log("db cleared before seeding");
     }
   });
-  const collection = await createCollection();
-  About.insertMany(collection, (err, item) => {
-    if (err) {
-      return console.log("err", err);
-    }
-    console.log("collection seeded");
+
+  createCollection().then((value) => {
+    console.log(value);
     mongoose.connection.close();
     console.log("db closed!");
-    return;
   });
-};
-
+  return;
+}
 module.exports = { save };

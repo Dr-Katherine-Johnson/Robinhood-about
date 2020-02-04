@@ -6,7 +6,8 @@ mongoose.connect(
   // "mongodb://database/robinhood",
   {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    autoIndex: false
   }
 );
 
@@ -14,10 +15,30 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   console.log("db connected!");
+  // db.db.listCollections().toArray(function(err, names) {
+  //   if (err) {
+  //     console.log(err);
+  //     } else {
+  //       for (i = 0; i < names.length; i++) {
+  //         console.log(names[i].name);
+  //         if ((names[i].name = "abouts")) {
+  //           console.log("Abouts Collection Exists in DB");
+  //           About.abouts.dropIndexes(
+  //               function(err, result) {
+  //                 console.log("Collection droped");
+  //               }
+  //           );
+  //           console.log("Abouts Collection No Longer Available");
+  //         } else {
+  //             console.log("Collection doesn't exist");
+  //         }
+  //       }
+  //     }
+  // });
 });
 
 const aboutSchema = mongoose.Schema({
-  ticker: { type: String, unique: true, required: true },
+  ticker: { type: String, unique: true, required: true, index: true },
   about: String,
   CEO: String,
   open: String,
