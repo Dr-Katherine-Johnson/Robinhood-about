@@ -1,4 +1,4 @@
-const { postAbout, getAbout, putAbout, deleteAbout } = require("../database/index.js"); // database
+const { postAbout, getAbout, putAbout, deleteAbout } = require("../database/index-mongo.js"); // database
 var express = require('express')
 var router = express.Router()
 
@@ -12,12 +12,11 @@ router.post('/', (req, res) => {
       console.log("Created:", result);
       res.status(201).json(result);
     }
-  });
-})
+  }); 
+});
 
 // Read
-router.get("/:ticker", (req, res) => {
-  // console.log('req.params', req.params);
+router.get('/:ticker', (req, res) => {
   let queryString = req.params.ticker;
   console.log("queryString", queryString);
   getAbout(queryString, (err, result) => {
@@ -28,10 +27,10 @@ router.get("/:ticker", (req, res) => {
       res.status(200).json(result);
     }
   });
-});
+})
 
 // Update
-router.put('/:ticker', function (req, res) {
+router.put('/:ticker', (req, res) => {
   let queryString = req;
   putAbout(queryString,(err, result) => {
     if (err) {
@@ -44,7 +43,7 @@ router.put('/:ticker', function (req, res) {
 })
 
 // Delete
-router.delete('/:ticker', function (req, res) {
+router.delete('/:ticker', (req, res) => {
   let queryString = req.params.ticker;
   deleteAbout(queryString,(err, result) => {
     if (err) {

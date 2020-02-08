@@ -1,4 +1,4 @@
-const { About, mongoose } = require("../database/index.js");
+const { About, mongoose } = require("../database/index-mongo.js");
 const { tickers } = require("./tickerCreator.js");
 const { nFormatter, createPrices } = require('./numCreator.js');
 const faker = require("faker");
@@ -6,8 +6,8 @@ const faker = require("faker");
 // cycle through ticker array and create data for each item
 const createCollection = async () => {
   let collArr = [];
-
-  for (let i = 0; i < 100000; i++) { //tickers.length
+  
+  for (let i = 0; i < tickers.length; i++) { //tickers.length, did i ned to reset collarr is [] later
     let prices = createPrices();
     const stock = new About({
       ticker: tickers[i],

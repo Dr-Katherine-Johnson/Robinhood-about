@@ -19,7 +19,7 @@ function createTickers() {
     }
     for (var i=0; i < 26; i++) {
       recursiveFunction(singleSolution.concat([String.fromCharCode(startValue + i)]));
-      if (result.length > 10000000) {
+      if (result.length > 10000000) { 
         break;
       }
     }

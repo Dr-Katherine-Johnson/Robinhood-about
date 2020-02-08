@@ -33,7 +33,7 @@ class About extends React.Component {
     const ticker = this.state.data.ticker;
     fetch(
       // `http://ec2-54-215-175-243.us-west-1.compute.amazonaws.com:3333/about/ABCD`,
-      "/about/ABCD",
+      "/about/ABCDE",
       {
         method: "GET"
       }
@@ -41,8 +41,9 @@ class About extends React.Component {
       .then(result => {
         return result.json();
       })
-      .then(data => {
-        fetch("http://ec2-54-88-251-88.compute-1.amazonaws.com:4444/price/ABCD")
+      .then(data => { // from christian's chart
+        // fetch("http://ec2-54-88-251-88.compute-1.amazonaws.com:4444/price/ABCD")
+          fetch("/about/ABCDE")
           .then(result => {
             return result.json();
           })
@@ -56,7 +57,7 @@ class About extends React.Component {
 
   getValues(data) {
     let stateObj = {};
-    const open = data.prices[0].open;
+    const open = 132.58//data.prices[0].open; 
     stateObj = {
       high: `$${(open + open * 0.1).toFixed(2)}`,
       low: `$${(open - open * 0.1).toFixed(2)}`,

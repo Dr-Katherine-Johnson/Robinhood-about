@@ -1,4 +1,4 @@
 module.exports = {
-  DATABASE: 'mongo'
+  DATABASE: 'postGres'
 };
 //mongo, postGres, riak

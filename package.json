@@ -53,6 +53,7 @@
     "mongoose": "^5.7.10",
     "nodemon": "^1.19.4",
     "pg": "^7.18.1",
+    "pg-promise": "^10.4.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "webpack": "^4.41.2",
@@ -63,6 +64,7 @@
     "express-static-gzip": "^2.0.5",
     "faker": "^4.1.0",
     "mocha": "^6.2.2",
+    "newrelic": "^6.3.0",
     "supertest": "^4.0.2"
   }
 }
