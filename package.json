@@ -9,7 +9,8 @@
     "test": "jest --detectOpenHandles --runInBand ./test",
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon server/index.js",
-    "start-docker": "node seeds/runSeed.js && node server/index.js"
+    "start-docker": "node seeds/runSeed.js && node server/index.js",
+    "stresstest": "k6 run stresstest.js"
   },
   "jest": {
     "testEnvironment": "node",
@@ -64,7 +65,7 @@
     "express-static-gzip": "^2.0.5",
     "faker": "^4.1.0",
     "mocha": "^6.2.2",
-    "newrelic": "^6.3.0",
+    "newrelic": "^6.4.1",
     "supertest": "^4.0.2"
   }
 }
