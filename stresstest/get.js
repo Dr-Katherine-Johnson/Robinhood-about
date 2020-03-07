@@ -2,12 +2,15 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 
 export let options = {
-  rps: 1000,
+  // rps: 1000,
+  // rps: 100,
+  // rps: 10,
+  rps: 1,
   vus: 200,
   duration: "30s"
 };
 
-
+//Get test
 export default function() {
   let iterationStart = new Date().getTime();
   let res = http.get("http://localhost:3333/");
