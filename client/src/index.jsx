@@ -2,14 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import CompanyFundamentals from "./components/companyFundamentals.jsx";
 import CompanyDescription from "./components/companyDescription.jsx";
-import config from "../../env.config.js";
 
 class About extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: {
-        ticker: "ABCD",
+        ticker: "ABCDE",
         about: "",
         CEO: "",
         open: 0,
@@ -31,9 +30,9 @@ class About extends React.Component {
 
   componentDidMount() {
     const ticker = this.state.data.ticker;
-    fetch(
-      // `http://ec2-54-215-175-243.us-west-1.compute.amazonaws.com:3333/about/ABCD`,
-      "/about/ABCDE",
+    console.log(process.env.REACT_APP_API)
+    fetch( `ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`,
+    // fetch(`/about/${ticker}`,
       {
         method: "GET"
       }
@@ -42,8 +41,8 @@ class About extends React.Component {
         return result.json();
       })
       .then(data => { // from christian's chart
-        // fetch("http://ec2-54-88-251-88.compute-1.amazonaws.com:4444/price/ABCD")
-          fetch("/about/ABCDE")
+        fetch(`ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`)
+          // fetch(`/about/${ticker}`)
           .then(result => {
             return result.json();
           })

@@ -1,8 +1,8 @@
+require('dotenv').config()
+
 module.exports = {
-  PORT: 3333,
-  DATABASE_URL: "mongodb://127.0.0.1",
-  DATABASE_PORT: "27017",
-  DATABASE_NAME: "robinhood",
-  SERVICE_API_URL: "http://localhost",
-  SERVICE_API_PORT: "3333"
+  PORT: process.env.PORT,
+  DB_URL: process.env.DB_URL,
+  SERVICE_API_URL: process.env.API_URL,
+  REACT_APP_BASE: process.env.REACT_APP_BASE
 };

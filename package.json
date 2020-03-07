@@ -58,11 +58,13 @@
     "pg-promise": "^10.4.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-scripts": "^3.4.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
     "chai": "^4.2.0",
+    "dotenv": "^8.2.0",
     "express-static-gzip": "^2.0.5",
     "faker": "^4.1.0",
     "mocha": "^6.2.2",

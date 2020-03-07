@@ -1,5 +1,7 @@
 const { Pool, Client } = require('pg')
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/abouts';
+const { DB_URL } = require('./config');
+
+const connectionString = DB_URL// || 'postgres://localhost:5432/abouts';
 // const connectionObj = {
 //     user: 'siminlei',
 //     host: 'localhost',
