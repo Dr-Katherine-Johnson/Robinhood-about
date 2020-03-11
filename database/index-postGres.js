@@ -1,7 +1,15 @@
 const pgp = require('pg-promise')({
     capSQL: true // capitalize all generated SQL
 });
-const cn = process.env.DATABASE_URL || 'postgres://localhost:5432/abouts';
+// const cn = 'postgres://localhost:5432/abouts';
+
+const cn = {
+    host: '127.0.0.1',
+    port: 5432,
+    database: 'abouts',
+    user: 'postgres',
+    password: 'password'
+};
 
 const db = pgp(cn);
 

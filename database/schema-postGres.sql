@@ -27,4 +27,3 @@ CREATE TABLE tickers (
  *    \i database/schema-postGres.sql
  * to connect to locahost: psql -h localhost -p 5432 -U siminlei abouts
  *  to create the database and the tables.*/
-

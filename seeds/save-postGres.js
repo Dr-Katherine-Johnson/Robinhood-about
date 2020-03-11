@@ -41,7 +41,7 @@ const createCollection = async () => {
 
     // every 1000 items, insert into the database
     const isLastItem = i === tickers.length - 1;
-    if (i % 1000 === 0 || isLastItem) {
+    if (i % 500 === 0 || isLastItem) {
 
       // generating a multi-row insert query:
       var query = pgp.helpers.insert(values, cs);
@@ -51,7 +51,13 @@ const createCollection = async () => {
       await db.none(query)
         .then(data => {
           console.log('SUCCESS: ', i)
-          return new Promise((resolve, reject) => { resolve(values = 0)})
+          return new Promise((resolve, reject) => { 
+            if (i % 10000 === 0) {
+              setTimeout(function(){ resolve(values = 0) }, 5000);
+            } else {
+              resolve(values = 0);
+            }
+          })
         })
         .catch(error => {
             console.log('ERROR ', i, ': ', error);

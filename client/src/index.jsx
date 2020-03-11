@@ -31,8 +31,8 @@ class About extends React.Component {
   componentDidMount() {
     const ticker = this.state.data.ticker;
     console.log(process.env.REACT_APP_API)
-    fetch( `ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`,
-    // fetch(`/about/${ticker}`,
+    // fetch( `ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`,
+    fetch(`/about/${ticker}`,
       {
         method: "GET"
       }
@@ -41,8 +41,8 @@ class About extends React.Component {
         return result.json();
       })
       .then(data => { // from christian's chart
-        fetch(`ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`)
-          // fetch(`/about/${ticker}`)
+        // fetch(`ec2-3-135-182-136.us-east-2.compute.amazonaws.com:3333/about/${ticker}`)
+          fetch(`/about/${ticker}`)
           .then(result => {
             return result.json();
           })
