@@ -11,7 +11,8 @@
     "server-dev": "nodemon server/index.js",
     "start-docker": "node seeds/runSeed.js && node server/index.js",
     "stresstest-get": "k6 run stresstest/get.js",
-    "stresstest-post": "k6 run stresstest/post.js"
+    "stresstest-post": "k6 run stresstest/post.js",
+    "seed2": "node -e 'require('./seeds/runSeed.js').save2()'"
   },
   "jest": {
     "testEnvironment": "node",
