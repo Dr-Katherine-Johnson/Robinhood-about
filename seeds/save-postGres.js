@@ -52,11 +52,7 @@ const createCollection = async () => {
         .then(data => {
           console.log('SUCCESS: ', i)
           return new Promise((resolve, reject) => { 
-            if (i % 10000 === 0) {
-              setTimeout(function(){ resolve(values = 0) }, 5000);
-            } else {
-              resolve(values = 0);
-            }
+            resolve(values = 0);
           })
         })
         .catch(error => {

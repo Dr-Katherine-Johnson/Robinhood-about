@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/index.js",
-    "seed": "node ./seeds/runSeed.js",
+    "seed": "node -e \"require('./seeds/runSeed').save()\"",
     "test": "jest --detectOpenHandles --runInBand ./test",
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon server/index.js",
     "start-docker": "node seeds/runSeed.js && node server/index.js",
     "stresstest-get": "k6 run stresstest/get.js",
     "stresstest-post": "k6 run stresstest/post.js",
-    "seed2": "node -e 'require('./seeds/runSeed.js').save2()'"
+    "seed2": "node -e \"require('./seeds/runSeed').save2()\""
   },
   "jest": {
     "testEnvironment": "node",
@@ -47,6 +47,7 @@
     "brotli-webpack-plugin": "^1.1.0",
     "compression-webpack-plugin": "^3.1.0",
     "cors": "^2.8.5",
+    "csv-write-stream": "^2.0.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "express": "^4.17.1",
