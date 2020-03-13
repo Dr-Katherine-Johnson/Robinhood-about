@@ -9,13 +9,14 @@ const csvWriter = require('csv-write-stream')
 //CSV file paths
 var csvFilename = "./seeds/seeds_data.csv";
 var absPath = path.resolve(csvFilename);
+var interval = 500000;
 
 // cycle through ticker array and create data for each item
 const createCollection = async (writer, encoding, start, cb) => {
   console.log('PATH:', absPath);
 
   //Iterator
-  let i = start + 500000;
+  let i = start + interval;
   let id = start;
 
   let write = async () => {
@@ -50,10 +51,10 @@ const createCollection = async (writer, encoding, start, cb) => {
       }
 
       if (i === start) {
-        console.log('END', id)
+        console.log('END', id, 'START:', start)
         await writer.write(stock, encoding, cb);      
       } else {
-        console.log(stock.ticker, 'ID: ', id)
+        console.log(stock.ticker, 'ID: ', id, ' START: ', start)
         ok = await writer.write(stock);
       }
     } while (i > start && ok);
@@ -77,21 +78,20 @@ const save2 = () => {
       .then(() => {
         console.log('Connected to PostGres')
         db.none('TRUNCATE TABLE "abouts"')
-        .then(() => {
-          for (let i = 0; i <= ticker.length; i+=500000) {
+        .then(async() => {
+          for (let j = 0; j < (tickers.length - interval); j+=interval) {
             // If CSV file exists, delete it and recreate with headers
             if (fs.existsSync(csvFilename)) {
-              fs.unlinkSync(csvFilename)
+              await fs.unlinkSync(csvFilename)
             }
-            var writer = csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
-            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+            var writer = await csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
+            await writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
 
-            createCollection(writer, 'utf-8', i, async() => {
+            await createCollection(writer, 'utf-8', j, async() => {
               writer.end();
               return await db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
               .then(() => {
                 console.log('SUCCESSFULLY COPIED INTO POSTGRES')
-                fs.unlinkSync(csvFilename);
               })
               .catch(error => {
                   console.log('ERROR: ', error);
