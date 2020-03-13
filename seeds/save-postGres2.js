@@ -11,12 +11,12 @@ var csvFilename = "./seeds/seeds_data.csv";
 var absPath = path.resolve(csvFilename);
 
 // cycle through ticker array and create data for each item
-const createCollection = async (writer, encoding, cb) => {
+const createCollection = async (writer, encoding, start, cb) => {
   console.log('PATH:', absPath);
-  
+
   //Iterator
-  let i = tickers.length;
-  let id = 0;
+  let i = start + 500000;
+  let id = start;
 
   let write = async () => {
     let ok = true;
@@ -49,15 +49,15 @@ const createCollection = async (writer, encoding, cb) => {
         volume: nFormatter(faker.random.number({ min: 10000000, max: 30000000 }))
       }
 
-      if (i === 0) {
+      if (i === start) {
         console.log('END', id)
         await writer.write(stock, encoding, cb);      
       } else {
         console.log(stock.ticker, 'ID: ', id)
         ok = await writer.write(stock);
       }
-    } while (i > 0 && ok);
-    if (i > 0) {
+    } while (i > start && ok);
+    if (i > start) {
     // had to stop early!
     // write some more once it drains
       await console.log('STOPPED')
@@ -78,24 +78,26 @@ const save2 = () => {
         console.log('Connected to PostGres')
         db.none('TRUNCATE TABLE "abouts"')
         .then(() => {
-          // If CSV file exists, delete it and recreate with headers
-          if (fs.existsSync(csvFilename)) {
-            fs.unlinkSync(csvFilename)
-          }
-          var writer = csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
-          writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+          for (let i = 0; i <= ticker.length; i+=500000) {
+            // If CSV file exists, delete it and recreate with headers
+            if (fs.existsSync(csvFilename)) {
+              fs.unlinkSync(csvFilename)
+            }
+            var writer = csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
+            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
 
-          createCollection(writer, 'utf-8', async() => {
-            writer.end();
-            return await db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
-            .then(() => {
-              console.log('SUCCESSFULLY COPIED INTO POSTGRES')
-                // fs.unlinkSync(csvFilename);
+            createCollection(writer, 'utf-8', i, async() => {
+              writer.end();
+              return await db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
+              .then(() => {
+                console.log('SUCCESSFULLY COPIED INTO POSTGRES')
+                fs.unlinkSync(csvFilename);
+              })
+              .catch(error => {
+                  console.log('ERROR: ', error);
+              });
             })
-            .catch(error => {
-                console.log('ERROR: ', error);
-            });
-          })
+          }
         })
       })
     })
