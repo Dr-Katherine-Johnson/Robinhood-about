@@ -9,7 +9,7 @@ const csvWriter = require('csv-write-stream')
 //CSV file paths
 var csvFilename = "./seeds/seeds_data.csv";
 var absPath = path.resolve(csvFilename);
-var interval = 200000;
+var interval = 100000;
 
 // cycle through ticker array and create data for each item
 const createCollection = async (writer, encoding, start, cb) => {
@@ -18,6 +18,8 @@ const createCollection = async (writer, encoding, start, cb) => {
   //Iterator
   let i = start + interval;
   let id = start;
+  var prices = 0;
+  var stock = 0;
 
   let write = async () => {
     let ok = true;
@@ -52,10 +54,14 @@ const createCollection = async (writer, encoding, start, cb) => {
 
       if (i === start) {
         console.log('END', id, 'START:', start)
-        await writer.write(stock, encoding, cb);      
+        await writer.write(stock, encoding, cb);
+        stock = 0;
+        prices = 0;      
       } else {
         console.log(stock.ticker, 'ID: ', id, ' START: ', start)
         ok = await writer.write(stock);
+        stock = 0;
+        prices = 0;
       }
     } while (i > start && ok);
     if (i > start) {
@@ -65,7 +71,8 @@ const createCollection = async (writer, encoding, start, cb) => {
       await writer.once('drain', write);
     }
   }
-  await write()
+  await write();
+  return;
 }
  
 const recurCB = async (start) => {
@@ -81,7 +88,7 @@ const recurCB = async (start) => {
           fs.unlink(csvFilename, (err) => {
             if (err) throw err;
             if ((start + interval + interval) < tickers.length) {
-              setTimeout(function(){ recurCB(start + interval)}, 20000);
+              setTimeout(function(){ recurCB(start + interval)}, 30000);
             } else {
               console.log('SEEDING COMPLETE')
             } 
@@ -95,30 +102,41 @@ const recurCB = async (start) => {
       console.log('CANT OPEN FILE: ', err)
     }
   })
+  return;
 }
-
 
 const save2 = () => {
   console.log('LENGTH: ', tickers.length)
   // Start up database and table
-  db.none('DROP TABLE IF EXISTS $1:name', 'abouts')
+  // db.none('DROP TABLE IF EXISTS $1:name', 'abouts')
+  //   .then(() => {
+  //     console.log('Creating table');
+    db.none('CREATE TABLE IF NOT EXISTS "abouts"("ticker" VARCHAR (50) UNIQUE NOT NULL, "about" TEXT, "CEO" VARCHAR (200), "open" VARCHAR (50), "high" VARCHAR (50), "low" VARCHAR (50), "marketCap" VARCHAR (50), "yearLow" VARCHAR (50), "yearHigh" VARCHAR (50), "employees" INT, "priceEarnings" REAL, "headquarters" VARCHAR (200), "dividendYield" REAL, "founded" INT, "averageVolume" VARCHAR (50), "volume" VARCHAR (50))')
     .then(() => {
-      console.log('Creating table');
-      db.none('CREATE TABLE "abouts"("ticker" VARCHAR (50) UNIQUE NOT NULL, "about" TEXT, "CEO" VARCHAR (200), "open" VARCHAR (50), "high" VARCHAR (50), "low" VARCHAR (50), "marketCap" VARCHAR (50), "yearLow" VARCHAR (50), "yearHigh" VARCHAR (50), "employees" INT, "priceEarnings" REAL, "headquarters" VARCHAR (200), "dividendYield" REAL, "founded" INT, "averageVolume" VARCHAR (50), "volume" VARCHAR (50))')
+      console.log('Connected to PostGres')
+      db.none('TRUNCATE TABLE "abouts"') 
       .then(() => {
-        console.log('Connected to PostGres')
-        db.none('TRUNCATE TABLE "abouts"') 
-        .then(() => {
-          // If CSV file exists, delete it and recreate with headers
-          recurCB(0)
-          });            
-        })
+        // If CSV file exists, delete it and recreate with headers
+        recurCB(0)
+        });            
       })
+      // })
     .catch(error => {
       console.log(error)
     })
   return;
 }
 
-module.exports = { save2 };
+const save3 = () => {
+  db.one('SELECT COUNT(*) FROM "abouts"')
+  .then((value) => {
+    console.log(value)
+    recurCB(value + 1)
+  })
+  .catch(error => {
+    console.log(error)
+  })
+}
+
+module.exports = { save2, save3 };
 

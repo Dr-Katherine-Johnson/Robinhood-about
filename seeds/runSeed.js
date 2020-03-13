@@ -9,3 +9,7 @@ module.exports.save = function () {
 module.exports.save2 = function () {
   save2();
 };
+
+module.exports.save3 = function () {
+  save3();
+};

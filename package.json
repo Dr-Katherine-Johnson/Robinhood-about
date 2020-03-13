@@ -12,6 +12,7 @@
     "start-docker": "node seeds/runSeed.js && node server/index.js",
     "stresstest-get": "k6 run stresstest/get.js",
     "stresstest-post": "k6 run stresstest/post.js",
+    "seed3": "node -e \"require('./seeds/runSeed').save3()\"",
     "seed2": "node -e \"require('./seeds/runSeed').save2()\""
   },
   "jest": {
