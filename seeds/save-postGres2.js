@@ -9,7 +9,7 @@ const csvWriter = require('csv-write-stream')
 //CSV file paths
 var csvFilename = "./seeds/seeds_data.csv";
 var absPath = path.resolve(csvFilename);
-var interval = 500;
+var interval = 200000;
 
 // cycle through ticker array and create data for each item
 const createCollection = async (writer, encoding, start, cb) => {
@@ -78,11 +78,14 @@ const recurCB = async (start) => {
         db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
         .then(() => {
           console.log('SUCCESSFULLY COPIED INTO POSTGRES')
-          if ((start + interval + interval) < tickers.length) {
-            recurCB(start + interval)
-          } else {
-            console.log('SEEDING COMPLETE')
-          } 
+          fs.unlink(csvFilename, (err) => {
+            if (err) throw err;
+            if ((start + interval + interval) < tickers.length) {
+              setTimeout(function(){ recurCB(start + interval)}, 20000);
+            } else {
+              console.log('SEEDING COMPLETE')
+            } 
+          });
         })
         .catch(error => {
             console.log('ERROR: ', error);
