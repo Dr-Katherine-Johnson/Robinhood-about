@@ -1,6 +1,6 @@
 const { DATABASE } = require("../tempConfig.js"); //NEED TO CHANGE
 const { save } = require(`./save-${ DATABASE }`);
-const { save2 } = require(`./save-${ DATABASE }2`);
+const { save2, save3 } = require(`./save-${ DATABASE }2`);
 
 module.exports.save = function () {
   save();
