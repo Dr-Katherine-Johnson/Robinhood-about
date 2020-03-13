@@ -9,7 +9,7 @@ const csvWriter = require('csv-write-stream')
 //CSV file paths
 var csvFilename = "./seeds/seeds_data.csv";
 var absPath = path.resolve(csvFilename);
-var interval = 500000;
+var interval = 500;
 
 // cycle through ticker array and create data for each item
 const createCollection = async (writer, encoding, start, cb) => {
@@ -67,6 +67,33 @@ const createCollection = async (writer, encoding, start, cb) => {
   }
   await write()
 }
+ 
+const recurCB = async (start) => {
+  fs.open(csvFilename, 'w', (err, fd) => {
+    if (fd) {
+      var writer = csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
+      writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+      createCollection(writer, 'utf-8', start, () => {
+        writer.end();
+        db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
+        .then(() => {
+          console.log('SUCCESSFULLY COPIED INTO POSTGRES')
+          if ((start + interval + interval) < tickers.length) {
+            recurCB(start + interval)
+          } else {
+            console.log('SEEDING COMPLETE')
+          } 
+        })
+        .catch(error => {
+            console.log('ERROR: ', error);
+        });
+      })       
+    } else if (err) {
+      console.log('CANT OPEN FILE: ', err)
+    }
+  })
+}
+
 
 const save2 = () => {
   console.log('LENGTH: ', tickers.length)
@@ -77,30 +104,13 @@ const save2 = () => {
       db.none('CREATE TABLE "abouts"("ticker" VARCHAR (50) UNIQUE NOT NULL, "about" TEXT, "CEO" VARCHAR (200), "open" VARCHAR (50), "high" VARCHAR (50), "low" VARCHAR (50), "marketCap" VARCHAR (50), "yearLow" VARCHAR (50), "yearHigh" VARCHAR (50), "employees" INT, "priceEarnings" REAL, "headquarters" VARCHAR (200), "dividendYield" REAL, "founded" INT, "averageVolume" VARCHAR (50), "volume" VARCHAR (50))')
       .then(() => {
         console.log('Connected to PostGres')
-        db.none('TRUNCATE TABLE "abouts"')
-        .then(async() => {
-          for (let j = 0; j < (tickers.length - interval); j+=interval) {
-            // If CSV file exists, delete it and recreate with headers
-            if (fs.existsSync(csvFilename)) {
-              await fs.unlinkSync(csvFilename)
-            }
-            var writer = await csvWriter({ headers: ['ticker', 'about', 'CEO', 'open', 'high', 'low', 'marketCap', 'yearLow', 'yearHigh', 'employees', 'priceEarnings', 'headquarters', 'dividendYield', 'founded', 'averageVolume', 'volume']});
-            await writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
-
-            await createCollection(writer, 'utf-8', j, async() => {
-              writer.end();
-              return await db.none("COPY abouts FROM $1 WITH (format csv, header)", absPath)
-              .then(() => {
-                console.log('SUCCESSFULLY COPIED INTO POSTGRES')
-              })
-              .catch(error => {
-                  console.log('ERROR: ', error);
-              });
-            })
-          }
+        db.none('TRUNCATE TABLE "abouts"') 
+        .then(() => {
+          // If CSV file exists, delete it and recreate with headers
+          recurCB(0)
+          });            
         })
       })
-    })
     .catch(error => {
       console.log(error)
     })
