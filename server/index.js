@@ -17,6 +17,9 @@ const mountRoutes = require('../controller/index.js');
 app.use(expressStaticGzip(path.join(__dirname, "/../client/dist")));
 app.use(express.static(__dirname + "/../client/dist"));
 
+//Loader.io testing
+app.use(express.static(__dirname + "/../stresstest/loaderio-00c454145c6f35ffdd451f9fd6d1203d.txt"))
+
 //Routing files
 mountRoutes(app);
 app.get("/", (req, res) => {
