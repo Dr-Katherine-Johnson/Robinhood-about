@@ -1,4 +1,7 @@
+//Stresstest
 require('newrelic');
+
+//Server side libraries
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -8,6 +11,7 @@ var expressStaticGzip = require("express-static-gzip");
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 
 //Environment variables 
 const config = require("../env.config.js");
@@ -26,6 +30,7 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 
+//Ports
 const port = config.PORT;
 
 let server = app.listen(port, function() {
