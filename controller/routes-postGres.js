@@ -64,22 +64,22 @@ router.get('/:ticker', async (req, res) => {
           client.expire(`data:${queryString}`, 72000);
           console.log('GOT FROM REDIS', result)
           res.status(200).json(result);
-        } else {
-          //GET FROM API
-          db.one('SELECT * FROM abouts WHERE ticker = $1', [queryString])
-          .then((result) => {
-            const duration = Date.now() - start
-            console.log('EXECUTED READ', { duration, rows: result })
-
-            redisPost(result); //Redis add
-
-            res.status(200).json(result);
-          })
-          .catch((err) =>
-            res.status(400).json(`Error: ${err}`)
-          );   
         }
       })
+    } else {
+      //GET FROM API
+      db.one('SELECT * FROM abouts WHERE ticker = $1', [queryString])
+      .then((result) => {
+        const duration = Date.now() - start
+        console.log('EXECUTED READ', { duration, rows: result })
+
+        redisPost(result); //Redis add
+
+        res.status(200).json(result);
+      })
+      .catch((err) =>
+        res.status(400).json(`Error: ${err}`)
+      );   
     }
   });
 }); 
