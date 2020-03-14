@@ -28,8 +28,8 @@ const createCollection = async (writer, encoding, start, cb) => {
       id += 1;
 
       //create data
-      var prices = createPrices();
-      var stock = await {
+      prices = createPrices();
+      stock = await {
         ticker: tickers[i],
         about: faker.lorem.paragraph((sentence_count = 10)),
         CEO: faker.name.findName(),
@@ -131,7 +131,7 @@ const save3 = () => {
   db.one('SELECT COUNT(*) FROM "abouts"')
   .then((value) => {
     console.log(value)
-    recurCB(value + 1)
+    recurCB(Number(value.count) + 1)
   })
   .catch(error => {
     console.log(error)
