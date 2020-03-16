@@ -1,33 +1,11 @@
 const Router = require('express-promise-router')
 const { db, pgp, query } = require('../database/index-postGres.js')
 const router = new Router();
-const middleware = require('../server/numMiddleware.js');
-
-//REDIS
-const redis = require("redis")
-const client = redis.createClient()
-client.on('error', (err) => {
-    console.log("Error " + err)
-})
-
-client.on('connect', function() {
-    console.log('Redis is now connected');
-});
-
-const redisPost = (body) => {
-  client.hmset(`data:${body.ticker}`, body, (err, res) => {
-    console.log('RES: ', res)
-    client.expire(`data:${body.ticker}`, 14400, (err, res) => {
-      console.log('ADDED TO REDIS: ', res, " TICKER: ", body.ticker)
-      if (err) {
-        console.log(err)
-      }
-    })
-  });
-}
+const { redisPost, redisGet } = require('./redis.js');
+const { colLookup } = require('../server/numMiddleware.js')
 
 // Create - need to create postabout
-router.post('/', middleware.convertIDtoTicker, async (req, res) => {
+router.post('/', (req, res, next) => {
   let queryString = req.body;
   var inputKeys = Object.keys(queryString);
   
@@ -44,6 +22,7 @@ router.post('/', middleware.convertIDtoTicker, async (req, res) => {
     console.log('EXECUTED CREATE', { duration, rows: result })
     redisPost(queryString); //Redis add
     res.status(201).json(result);
+    redisPost(queryString.ticker, queryString); //redis add
   })
   .catch((err) => {
     console.log('ERROR', err)
@@ -52,37 +31,25 @@ router.post('/', middleware.convertIDtoTicker, async (req, res) => {
 });
 
 // Read
-router.get('/:ticker', middleware.convertIDtoTicker, async (req, res) => {
+router.get('/:ticker', redisGet, (req, res, next) => {
   let queryString = req.params.ticker;
+  let column = colLookup(queryString);
+
   // start timer
   const start = Date.now()
-
-  //CHECK IF EXISTS IN REDIS
-  // client.exists(`data:${queryString}`, (err, reply) => {
-  //   if (reply === 1) {
-  //     client.hgetall(`data:${queryString}`, (err, result) => {
-  //       if (result) {
-  //         client.expire(`data:${queryString}`, 72000);
-  //         console.log('GOT FROM REDIS', result)
-  //         res.status(200).json(result);
-  //       }
-  //     })
-  //   } else {
       //GET FROM API
-      db.one('SELECT * FROM abouts WHERE ticker = $1', [queryString])
+      db.one('SELECT * FROM abouts WHERE $1~=$2', [column, queryString])
       .then((result) => {
         const duration = Date.now() - start
         console.log('EXECUTED READ', { duration, rows: result })
 
-        redisPost(result); //Redis add
-
         res.status(200).json(result);
+        redisPost(queryString, result); //Redis add
       })
-      .catch((err) =>
+      .catch((err) => {
+        console.log(err)
         res.status(400).json(`Error: ${err}`)
-      );   
-    // }
-  // });
+      });   
 }); 
 
 // Update
