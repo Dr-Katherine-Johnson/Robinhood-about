@@ -1,6 +1,7 @@
 const Router = require('express-promise-router')
 const { db, pgp, query } = require('../database/index-postGres.js')
 const router = new Router();
+const middleware = require('../server/numMiddleware.js');
 
 //REDIS
 const redis = require("redis")
@@ -17,7 +18,7 @@ const redisPost = (body) => {
   client.hmset(`data:${body.ticker}`, body, (err, res) => {
     console.log('RES: ', res)
     client.expire(`data:${body.ticker}`, 14400, (err, res) => {
-      console.log('ADDED TO REDIS: ', replies, " TICKER: ", body.ticker)
+      console.log('ADDED TO REDIS: ', res, " TICKER: ", body.ticker)
       if (err) {
         console.log(err)
       }
@@ -26,7 +27,7 @@ const redisPost = (body) => {
 }
 
 // Create - need to create postabout
-router.post('/', async (req, res) => {
+router.post('/', numMiddleware.convertIDtoTicker, async (req, res) => {
   let queryString = req.body;
   var inputKeys = Object.keys(queryString);
   
@@ -51,22 +52,22 @@ router.post('/', async (req, res) => {
 });
 
 // Read
-router.get('/:ticker', async (req, res) => {
+router.get('/:ticker', numMiddleware.convertIDtoTicker, async (req, res) => {
   let queryString = req.params.ticker;
   // start timer
   const start = Date.now()
 
   //CHECK IF EXISTS IN REDIS
-  client.exists(`data:${queryString}`, (err, reply) => {
-    if (reply === 1) {
-      client.hgetall(`data:${queryString}`, (err, result) => {
-        if (result) {
-          client.expire(`data:${queryString}`, 72000);
-          console.log('GOT FROM REDIS', result)
-          res.status(200).json(result);
-        }
-      })
-    } else {
+  // client.exists(`data:${queryString}`, (err, reply) => {
+  //   if (reply === 1) {
+  //     client.hgetall(`data:${queryString}`, (err, result) => {
+  //       if (result) {
+  //         client.expire(`data:${queryString}`, 72000);
+  //         console.log('GOT FROM REDIS', result)
+  //         res.status(200).json(result);
+  //       }
+  //     })
+  //   } else {
       //GET FROM API
       db.one('SELECT * FROM abouts WHERE ticker = $1', [queryString])
       .then((result) => {
@@ -80,8 +81,8 @@ router.get('/:ticker', async (req, res) => {
       .catch((err) =>
         res.status(400).json(`Error: ${err}`)
       );   
-    }
-  });
+    // }
+  // });
 }); 
 
 // Update

@@ -1,4 +1,4 @@
-function createTickers() {
+const createTickers = (max) => {
   // returns the same array of 10M unique strings (tickers)
   // each ticker is 3 - 4 characters in length // TODO: vary the ticker length
   // each ticker is made up of the letters A - Z
@@ -19,7 +19,7 @@ function createTickers() {
     }
     for (var i=0; i < 26; i++) {
       recursiveFunction(singleSolution.concat([String.fromCharCode(startValue + i)]));
-      if (result.length > 10000000) { 
+      if (result.length > max) { 
         break;
       }
     }
@@ -28,6 +28,6 @@ function createTickers() {
   return result;
 };
 
-let tickers = createTickers();
+let tickers = createTickers(10000000);
 
-module.exports = { tickers };
+module.exports = { tickers, createTickers };
