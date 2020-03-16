@@ -41,14 +41,13 @@ router.get('/:ticker', redisGet, (req, res, next) => {
       db.one('SELECT * FROM abouts WHERE $1~=$2', [column, queryString])
       .then((result) => {
         const duration = Date.now() - start
-        console.log('EXECUTED READ', { duration, rows: result })
-
         res.status(200).json(result);
+        console.log('EXECUTED READ', { duration, ticker: result.ticker, id: result.id })
         redisPost(queryString, result); //Redis add
       })
       .catch((err) => {
-        console.log(err)
         res.status(400).json(`Error: ${err}`)
+        console.log(err)
       });   
 }); 
 

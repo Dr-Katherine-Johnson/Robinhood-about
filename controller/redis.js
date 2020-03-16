@@ -24,23 +24,20 @@ const redisPost = (ticker, body) => {
 
 const redisGet = (req, res, next) => {
   let queryString = req.params.ticker;
-  client.exists(`data:${queryString}`, (err, reply) => {
-    if (reply === 1) {
-      client.hgetall(`data:${queryString}`, (err, result) => {
-        if (result) {
-          client.expire(`data:${queryString}`, 72000);
-          console.log('GOT FROM REDIS', result)
-          res.status(200).json(result);
-        }
-        if (err) {
-          console.log('ERR IN REDIS: ', err)
-        }
+  client.hgetall(`data:${queryString}`, (err, result) => {
+    if (err) {
+      console.log('ERR IN REDIS: ', err)
+    }
+    if (result.length > 0) {
+      res.status(200).json(result);
+      console.log('GOT FROM REDIS', result.ticker, 'ID: ', queryString)
+      client.expire(`data:${queryString}`, 72000, (err, result) => {
         return next('router');
-      })
+      });
     } else {
       next();
     }
-  }) 
+  })
 }
 
 module.exports = { redisPost, redisGet };
