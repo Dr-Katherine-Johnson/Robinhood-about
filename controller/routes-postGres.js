@@ -27,7 +27,7 @@ const redisPost = (body) => {
 }
 
 // Create - need to create postabout
-router.post('/', numMiddleware.convertIDtoTicker, async (req, res) => {
+router.post('/', middleware.convertIDtoTicker, async (req, res) => {
   let queryString = req.body;
   var inputKeys = Object.keys(queryString);
   
@@ -52,7 +52,7 @@ router.post('/', numMiddleware.convertIDtoTicker, async (req, res) => {
 });
 
 // Read
-router.get('/:ticker', numMiddleware.convertIDtoTicker, async (req, res) => {
+router.get('/:ticker', middleware.convertIDtoTicker, async (req, res) => {
   let queryString = req.params.ticker;
   // start timer
   const start = Date.now()
